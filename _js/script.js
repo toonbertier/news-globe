@@ -14,6 +14,8 @@ let controls;
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
+  light.position.set(camera.position.x, camera.position.y, camera.position.z);
+  light.rotation.set(camera.rotation.x, camera.rotation.y, camera.rotation.z);
 }
 
 function render() {
@@ -81,8 +83,8 @@ const init = () => {
   camera.position.set(0, 0, 500);
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-  light = new THREE.DirectionalLight(0xffffff, 0.8);
-  light.position.set(0, 1, 1);
+  light = new THREE.SpotLight(0xffffff, 0.8);
+  light.position.set(camera.position.x, camera.position.y, camera.position.z);
   scene.add(light);
 
   controls = new THREE.OrbitControls(camera);
