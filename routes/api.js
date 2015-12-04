@@ -2,12 +2,12 @@
 
 module.exports = [
 
-  {
-    method: 'GET',
-    path: '/hello',
-    handler: (request, reply) => reply({
-      'data': 'hello'
-    })
-  }
+  // {
+  //   method: 'GET',
+  //   path: '/hello',
+  //   handler: (request, reply) => reply({
+  //     'data': 'hello'
+  //   })
+  // }
 
 ];
