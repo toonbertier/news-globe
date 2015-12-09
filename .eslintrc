@@ -192,7 +192,8 @@
   },
 
   "globals": {
-    "THREE": true
+    "THREE": true,
+    "$": true
   }
 
 }

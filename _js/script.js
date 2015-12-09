@@ -8,6 +8,7 @@
 
 import {latLongToVector3} from './helpers/math';
 
+let api = require('../modules/api');
 let scene, camera, light, renderer;
 let controls;
 
@@ -51,24 +52,26 @@ const createGlobe = () => {
 
 };
 
-const createTestDots = () => {
+const createNewsDots = () => {
 
-  for(let i = 0; i < 100; i++) {
+  api.getArticlesFromNYTimes().then(articles => {
 
-    let lat = Math.random() * 180 - 90;
-    let long = Math.random() * 360 - 180;
+    $.each(articles, (key, article) => {
 
-    let pos = latLongToVector3(lat, long, 100, 0);
+      let pos = latLongToVector3(article.location.lat, article.location.lng, 100, 0);
+      let geometry = new THREE.SphereGeometry(2, 32, 32);
+      let material = new THREE.MeshLambertMaterial({color: 0xff0000});
+      let sphere = new THREE.Mesh(geometry, material);
+      sphere.position.set(pos.x, pos.y, pos.z);
+      scene.add(sphere);
 
-    let geometry = new THREE.SphereGeometry(2, 32, 32);
-    let material = new THREE.MeshLambertMaterial({color: 0xff0000});
+    });
 
-    let sphere = new THREE.Mesh(geometry, material);
-    sphere.position.set(pos.x, pos.y, pos.z);
+    render();
 
-    scene.add(sphere);
-
-  }
+  }).catch(err => {
+    console.log(err);
+  });
 
 };
 
@@ -101,7 +104,7 @@ const init = () => {
 
   createGlobe().then(() => {
     document.querySelector('.loading-div').classList.add('hide');
-    createTestDots();
+    createNewsDots();
     animate();
     render();
   });

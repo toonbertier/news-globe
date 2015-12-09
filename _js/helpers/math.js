@@ -9,6 +9,6 @@ export const latLongToVector3 = (lat, lon, radius, heigth) => {
   let y = (radius+heigth) * Math.sin(phi);
   let z = (radius+heigth) * Math.cos(phi) * Math.sin(theta);
 
-  return new THREE.Vector3(x,y,z);
+  return new THREE.Vector3(x, y, z);
 
 };
