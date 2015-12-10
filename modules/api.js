@@ -18,7 +18,7 @@ const getArticlesFromNYTimes = () => {
           $.getJSON(`https://maps.googleapis.com/maps/api/geocode/json?address=${article.geo_facet[0]}`, geocode => {
             article.location = geocode.results[0].geometry.location;
             articles.push(article);
-            console.log(article.geo_facet[0], '>', geocode.results[0].geometry.location.lat, geocode.results[0].geometry.location.lng);
+            // console.log(article.geo_facet[0], '>', geocode.results[0].geometry.location.lat, geocode.results[0].geometry.location.lng);
             if(articles.length === acceptedArticleCount) return resolve(articles);
           }).fail(err => reject(err));
         }, key * 200);
