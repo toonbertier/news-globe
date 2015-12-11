@@ -20,7 +20,7 @@ const DOTTYPES =
 {
   'NEWS': {
     'color': 0xff0000,
-    'radius': 2
+    'radius': 0.5
   },
   'USER': {
     'color': 0x00ff00,
@@ -177,10 +177,10 @@ const setupInputEvents = () => {
 
     if(e.clientX < window.innerWidth/3) {
       cameraDirLong = false;
-      cameraSpeedLong = (window.innerWidth/3 - e.clientX) / 1200;
+      cameraSpeedLong = (window.innerWidth/3 - e.clientX) / 800;
     } else if(e.clientX > 2 * window.innerWidth/3) {
       cameraDirLong = true;
-      cameraSpeedLong = (e.clientX - 2 * window.innerWidth/3) / 1200;
+      cameraSpeedLong = (e.clientX - 2 * window.innerWidth/3) / 800;
     } else {
       cameraSpeedLong = 0;
     }
@@ -189,10 +189,10 @@ const setupInputEvents = () => {
 
     if(e.clientY < window.innerHeight/3) {
       cameraDirLat = true;
-      cameraSpeedLat = (window.innerHeight/3 - e.clientY) / 1200;
+      cameraSpeedLat = (window.innerHeight/3 - e.clientY) / 800;
     } else if(e.clientY > 2 * window.innerHeight/3) {
       cameraDirLat = false;
-      cameraSpeedLat = (e.clientY - 2 * window.innerHeight/3) / 1200;
+      cameraSpeedLat = (e.clientY - 2 * window.innerHeight/3) / 800;
     } else {
       cameraSpeedLat = 0;
     }

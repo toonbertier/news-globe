@@ -7,7 +7,7 @@ const getArticlesFromNYTimes = () => {
     var articles = [];
     var acceptedArticleCount = 0;
 
-    $.getJSON('http://api.nytimes.com/svc/topstories/v1/world.json?api-key=35b802b79eac0b383a75cee4e82e605c:17:73657688', data => {
+    $.getJSON('http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/30.json?api-key=ecc27eb06cf46f006dc3111d9c5b7824:1:73657688', data => {
 
       $.each(data.results, (key, article) => {
 
