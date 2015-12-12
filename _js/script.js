@@ -124,10 +124,27 @@ const createDot = (lat, long, dotType) => {
 
 const createNewsDots = () => {
 
-  api.getArticlesFromNYTimes().then(articles => {
+  api.getArticlesFromURL('http://api.nytimes.com/svc/topstories/v1/world.json?api-key=35b802b79eac0b383a75cee4e82e605c:17:73657688').then(articles => {
+
+    var geoArticles = [];
 
     $.each(articles, (key, article) => {
-      createDot(article.location.lat, article.location.lng, DOTTYPES.NEWS);
+      console.log(article);
+
+      setTimeout(() => {
+        api.getGeolocationByAddress(article.geo_facet[0]).then(geocode => {
+
+          console.log(geocode);
+
+          if(geocode !== undefined) {
+            article.location = geocode;
+            geoArticles.push(article);
+            createDot(article.location.lat, article.location.lng, DOTTYPES.NEWS);
+          }
+
+        });
+      }, key * 200);
+
     });
 
     render();
