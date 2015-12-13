@@ -9,7 +9,9 @@
 import {latLongToVector3} from './helpers/math';
 
 let api = require('../modules/api');
+
 let scene, camera, light, renderer;
+let geoArticles = [];
 
 let cameraLong = 0, cameraLat = 0
 let cameraSpeedLong = 0, cameraSpeedLat = 0
@@ -19,14 +21,17 @@ const EARTH_RADIUS = 100;
 const DOTTYPES =
 {
   'NEWS': {
+    'type': 'news',
     'color': 0xff0000,
     'radius': 0.5
   },
   'USER': {
+    'type': 'user',
     'color': 0x00ff00,
     'radius': 1
   },
   'WEBCAM': {
+    'type': 'webcam',
     'color': 0xff00ff,
     'radius': 3
   }
@@ -110,12 +115,21 @@ const createGlobe = () => {
 
 };
 
-const createDot = (lat, long, dotType) => {
+const createDot = (lat, long, dotType, articleId) => {
 
   let pos = latLongToVector3(lat, long, EARTH_RADIUS, 0);
   let geometry = new THREE.SphereGeometry(dotType.radius, 32, 32);
   let material = new THREE.MeshLambertMaterial({color: dotType.color});
   let dot = new THREE.Mesh(geometry, material);
+
+  /* TODO : classke maken */
+
+  dot.clickable = true;
+  dot.dotType = dotType;
+
+  if(dotType.type == 'news') {
+    dot.articleId = articleId;
+  }
 
   dot.position.set(pos.x, pos.y, pos.z);
   scene.add(dot);
@@ -126,20 +140,15 @@ const createNewsDots = () => {
 
   api.getArticlesFromURL('http://api.nytimes.com/svc/topstories/v1/world.json?api-key=35b802b79eac0b383a75cee4e82e605c:17:73657688').then(articles => {
 
-    var geoArticles = [];
-
     $.each(articles, (key, article) => {
-      console.log(article);
 
       setTimeout(() => {
         api.getGeolocationByAddress(article.geo_facet[0]).then(geocode => {
 
-          console.log(geocode);
-
           if(geocode !== undefined) {
             article.location = geocode;
             geoArticles.push(article);
-            createDot(article.location.lat, article.location.lng, DOTTYPES.NEWS);
+            createDot(article.location.lat, article.location.lng, DOTTYPES.NEWS, key);
           }
 
         });
@@ -171,33 +180,16 @@ const getUserLocation = () => {
 
 const setupInputEvents = () => {
 
-  // document.addEventListener('keydown', function(e) {
-
-  //   switch (e.keyCode) {
-  //     case 37:
-  //       cameraDeg -= 1;
-  //       break;
-  //     case 39:
-  //       cameraDeg += 1;
-  //       break;
-  //   }
-
-  //   // document.addEventListener('keyup', function() {
-  //   //   robot.speed = 0;
-  //   // });
-
-  // });
-
-  window.addEventListener('mousemove', function(e) {
+  window.addEventListener('mousemove', e => {
 
     // long-rotatie
 
     if(e.clientX < window.innerWidth/3) {
       cameraDirLong = false;
-      cameraSpeedLong = (window.innerWidth/3 - e.clientX) / 800;
+      cameraSpeedLong = (window.innerWidth/3 - e.clientX) / 500;
     } else if(e.clientX > 2 * window.innerWidth/3) {
       cameraDirLong = true;
-      cameraSpeedLong = (e.clientX - 2 * window.innerWidth/3) / 800;
+      cameraSpeedLong = (e.clientX - 2 * window.innerWidth/3) / 500;
     } else {
       cameraSpeedLong = 0;
     }
@@ -206,13 +198,44 @@ const setupInputEvents = () => {
 
     if(e.clientY < window.innerHeight/3) {
       cameraDirLat = true;
-      cameraSpeedLat = (window.innerHeight/3 - e.clientY) / 800;
+      cameraSpeedLat = (window.innerHeight/3 - e.clientY) / 500;
     } else if(e.clientY > 2 * window.innerHeight/3) {
       cameraDirLat = false;
-      cameraSpeedLat = (e.clientY - 2 * window.innerHeight/3) / 800;
+      cameraSpeedLat = (e.clientY - 2 * window.innerHeight/3) / 500;
     } else {
       cameraSpeedLat = 0;
     }
+
+  });
+
+  window.addEventListener('mouseup', e => {
+
+    let mouseX = ( event.clientX / window.innerWidth ) * 2 - 1;
+    let mouseY = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    let mouse = new THREE.Vector2(mouseX, mouseY);
+
+    let raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+
+    let intersects = raycaster.intersectObjects(scene.children);
+
+    let obj = intersects[0].object
+    if(obj.clickable) {
+      obj.material.color = 0x0000ff;
+      if(obj.dotType.type == 'news') {
+        console.log(geoArticles[obj.articleId]);
+      }
+    }
+
+    // for (let i = 0; i < intersects.length; i++) {
+    //   let obj = intersects[i].object
+    //   if(obj.clickable) {
+    //     obj.material.color = "0000ff";
+    //     if(obj.dotType.type == 'news') {
+    //       console.log(geoArticles[obj.articleId]);
+    //     }
+    //   }
+    // }
 
   });
 
