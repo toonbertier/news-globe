@@ -105,7 +105,7 @@
     "no-unneeded-ternary": 0,
     "no-unreachable": 2,
     "no-unused-expressions": 2,
-    "no-unused-vars": [2, {"vars": "all", "args": "after-used"}],
+    "no-unused-vars": [2, {"vars": "all", "args": "after-used", "argsIgnorePattern": "reject"}],
     "no-use-before-define": 0,
     "no-void": 0,
     "no-var": 0,
@@ -193,7 +193,8 @@
 
   "globals": {
     "THREE": true,
-    "$": true
+    "$": true,
+    "bean": true
   }
 
 }

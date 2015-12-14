@@ -6,7 +6,7 @@ const getArticlesFromURL = url => {
 
     var articles = [];
     var acceptedArticleCount = 0;
-    $.getJSON('http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/30.json?api-key=ecc27eb06cf46f006dc3111d9c5b7824:1:73657688', data => {
+    $.getJSON(url, data => {
 
       $.each(data.results, (key, article) => {
 

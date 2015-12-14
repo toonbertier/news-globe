@@ -6,20 +6,19 @@
 // import 'babel-core/polyfill';
 // or import specific polyfills
 
-import {latLongToVector3} from './helpers/math';
-
 let api = require('../modules/api');
 
-let scene, camera, light, renderer;
-let geoArticles = [];
+let Article = require('./modules/Article');
+let Camera = require('./modules/Camera');
+let Controls = require('./modules/Controls');
+let Dot = require('./modules/Dot');
 
-let cameraLong = 0, cameraLat = 0
-let cameraSpeedLong = 0, cameraSpeedLat = 0
-let cameraDirLong = false, cameraDirLat = false;
+let scene, camera, renderer, controls;
+let currentArticle;
+let geoArticles = [], newsDots = [];
 
 const EARTH_RADIUS = 100;
-const DOTTYPES =
-{
+const DOTTYPES = {
   'NEWS': {
     'type': 'news',
     'color': 0xff0000,
@@ -35,54 +34,18 @@ const DOTTYPES =
     'color': 0xff00ff,
     'radius': 3
   }
-}
+};
 
 const update = () => {
 
   requestAnimationFrame(update);
-
-  moveCamera();
-
-  light.position.set(camera.position.x, camera.position.y, camera.position.z);
-  light.rotation.set(camera.rotation.x, camera.rotation.y, camera.rotation.z);
-
+  camera.update();
   render();
 
 };
 
 const render = () => {
-  renderer.render(scene, camera);
-};
-
-const moveCamera = () => {
-
-  let newCamLong;
-  if(cameraDirLong) {
-    newCamLong = cameraLong + cameraSpeedLong;
-  } else {
-    newCamLong = cameraLong - cameraSpeedLong;
-  }
-
-  if(newCamLong > -90 && newCamLong < 100) {
-    cameraLong = newCamLong;
-  }
-
-  let newCamLat;
-  if(cameraDirLat) {
-    newCamLat = cameraLat + cameraSpeedLat;
-  } else {
-    newCamLat = cameraLat - cameraSpeedLat;
-  }
-
-  if(newCamLat > -45 && newCamLat < 45) {
-    cameraLat = newCamLat;
-  }
-
-  let pos = latLongToVector3(cameraLat, cameraLong, 100, 100);
-  camera.position.set(pos.x, pos.y, pos.z);
-
-  camera.lookAt(new THREE.Vector3(0, 0, 0));
-
+  renderer.render(scene, camera.el);
 };
 
 const createGlobe = () => {
@@ -104,10 +67,7 @@ const createGlobe = () => {
         return resolve(true);
       },
       xhr => {
-        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-      },
-      xhr => {
-        console.log( 'An error happened' );
+        console.log(`${xhr.loaded / xhr.total * 100} % loaded`);
       }
     );
 
@@ -115,30 +75,9 @@ const createGlobe = () => {
 
 };
 
-const createDot = (lat, long, dotType, articleId) => {
-
-  let pos = latLongToVector3(lat, long, EARTH_RADIUS, 0);
-  let geometry = new THREE.SphereGeometry(dotType.radius, 32, 32);
-  let material = new THREE.MeshLambertMaterial({color: dotType.color});
-  let dot = new THREE.Mesh(geometry, material);
-
-  /* TODO : classke maken */
-
-  dot.clickable = true;
-  dot.dotType = dotType;
-
-  if(dotType.type == 'news') {
-    dot.articleId = articleId;
-  }
-
-  dot.position.set(pos.x, pos.y, pos.z);
-  scene.add(dot);
-
-};
-
 const createNewsDots = () => {
 
-  api.getArticlesFromURL('http://api.nytimes.com/svc/topstories/v1/world.json?api-key=35b802b79eac0b383a75cee4e82e605c:17:73657688').then(articles => {
+  api.getArticlesFromURL('http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/30.json?api-key=ecc27eb06cf46f006dc3111d9c5b7824:1:73657688').then(articles => {
 
     $.each(articles, (key, article) => {
 
@@ -148,7 +87,9 @@ const createNewsDots = () => {
           if(geocode !== undefined) {
             article.location = geocode;
             geoArticles.push(article);
-            createDot(article.location.lat, article.location.lng, DOTTYPES.NEWS, key);
+            let dot = new Dot(article.location.lat, article.location.lng, EARTH_RADIUS, DOTTYPES.NEWS, key);
+            newsDots.push(dot);
+            scene.add(dot.el);
           }
 
         });
@@ -164,12 +105,53 @@ const createNewsDots = () => {
 
 };
 
+const mouseClickedHandler = (objects) => {
+
+  let clickedNewsDot = false;
+
+  for (let i = 0; i < objects.length; i++) {
+
+    let obj = objects[i].object;
+
+    for(let j = 0; j < newsDots.length; j++) {
+      if(newsDots[j].el.uuid === obj.uuid) {
+        clickedNewsDot = newsDots[j];
+        break;
+      }
+    }
+
+    if(clickedNewsDot) break;
+
+  }
+
+  if(clickedNewsDot) {
+    currentArticle = new Article(geoArticles[clickedNewsDot.articleId]);
+    currentArticle.render();
+  }
+
+};
+
+const setupControls = () => {
+
+  controls = new Controls(scene, camera.el);
+
+  bean.on(controls, 'mouse_moved', v => {
+    camera.setCameraValues(v);
+  });
+
+  bean.on(controls, 'mouse_clicked', o => {
+    mouseClickedHandler(o);
+  });
+
+};
+
 const getUserLocation = () => {
 
-  if ("geolocation" in navigator) {
+  if ('geolocation' in navigator) {
 
     navigator.geolocation.getCurrentPosition(position => {
-      createDot(position.coords.latitude, position.coords.longitude, DOTTYPES.USER);
+      let dot = new Dot(position.coords.latitude, position.coords.longitude, EARTH_RADIUS, DOTTYPES.USER);
+      scene.add(dot.el);
     });
 
   } else {
@@ -178,86 +160,15 @@ const getUserLocation = () => {
 
 };
 
-const setupInputEvents = () => {
-
-  window.addEventListener('mousemove', e => {
-
-    // long-rotatie
-
-    if(e.clientX < window.innerWidth/3) {
-      cameraDirLong = false;
-      cameraSpeedLong = (window.innerWidth/3 - e.clientX) / 500;
-    } else if(e.clientX > 2 * window.innerWidth/3) {
-      cameraDirLong = true;
-      cameraSpeedLong = (e.clientX - 2 * window.innerWidth/3) / 500;
-    } else {
-      cameraSpeedLong = 0;
-    }
-
-    // lat-rotatie
-
-    if(e.clientY < window.innerHeight/3) {
-      cameraDirLat = true;
-      cameraSpeedLat = (window.innerHeight/3 - e.clientY) / 500;
-    } else if(e.clientY > 2 * window.innerHeight/3) {
-      cameraDirLat = false;
-      cameraSpeedLat = (e.clientY - 2 * window.innerHeight/3) / 500;
-    } else {
-      cameraSpeedLat = 0;
-    }
-
-  });
-
-  window.addEventListener('mouseup', e => {
-
-    let mouseX = ( event.clientX / window.innerWidth ) * 2 - 1;
-    let mouseY = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    let mouse = new THREE.Vector2(mouseX, mouseY);
-
-    let raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(mouse, camera);
-
-    let intersects = raycaster.intersectObjects(scene.children);
-
-    let obj = intersects[0].object
-    if(obj.clickable) {
-      obj.material.color = 0x0000ff;
-      if(obj.dotType.type == 'news') {
-        console.log(geoArticles[obj.articleId]);
-      }
-    }
-
-    // for (let i = 0; i < intersects.length; i++) {
-    //   let obj = intersects[i].object
-    //   if(obj.clickable) {
-    //     obj.material.color = "0000ff";
-    //     if(obj.dotType.type == 'news') {
-    //       console.log(geoArticles[obj.articleId]);
-    //     }
-    //   }
-    // }
-
-  });
-
-};
-
 const init = () => {
 
   getUserLocation();
-  setupInputEvents();
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(
-    45, window.innerWidth / window.innerHeight,
-    1, 10000
-  );
+  camera = new Camera();
+  scene.add(camera.light);
 
-  camera.position.set(0, 0, 200);
-  camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-  light = new THREE.SpotLight(0xffffff, 0.8);
-  light.position.set(camera.position.x, camera.position.y, camera.position.z);
-  scene.add(light);
+  setupControls();
 
   renderer = new THREE.WebGLRenderer();
 
@@ -269,7 +180,7 @@ const init = () => {
   document.querySelector('main').appendChild(renderer.domElement);
 
   createGlobe().then(() => {
-    document.querySelector('.loading-div').classList.add('hide');
+    document.querySelector('.loading').classList.add('hide');
     createNewsDots();
     update();
   });

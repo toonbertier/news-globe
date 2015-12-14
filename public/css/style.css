@@ -76,7 +76,7 @@ body {
   display: none;
 }
 
-.loading-div {
+.loading {
   position: absolute;
   z-index: 999;
   top: 0;
