@@ -2,9 +2,12 @@
 
 import {latLongToVector3} from '../helpers/math';
 
-export default class Dot {
+export class Dot {
 
   constructor(lat, long, earthRadius, dotType, articleId) {
+
+    this.lat = lat;
+    this.long = long;
 
     let pos = latLongToVector3(lat, long, earthRadius, 0);
 
@@ -12,15 +15,27 @@ export default class Dot {
     let material = new THREE.MeshLambertMaterial({color: dotType.color});
     this.el = new THREE.Mesh(geometry, material);
 
-    this.clickable = true;
     this.dotType = dotType;
-
-    if(dotType.type === 'news') {
-      this.articleId = articleId;
-    }
-
     this.el.position.set(pos.x, pos.y, pos.z);
+
   }
 
+}
+
+export class WebcamDot extends Dot {
+
+  constructor(lat, long, earthRadius, dotType, socketid) {
+    super(lat, long, earthRadius, dotType);
+    this.socketid = socketid;
+  }
+
+}
+
+export class NewsDot extends Dot {
+
+  constructor(lat, long, earthRadius, dotType, articleId) {
+    super(lat, long, earthRadius, dotType);
+    this.articleId = articleId;
+  }
 
 }

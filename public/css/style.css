@@ -85,3 +85,30 @@ body {
   text-align: center;
   padding-top: 50%;
 }
+
+.article,
+.videochat {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 10px;
+  font-size: 1.6em;
+}
+
+.article {
+  top: 50px;
+  right: 50px;
+}
+
+.videochat {
+  top: 50px;
+  left: 50px;
+}
+
+.video {
+  width: 240px;
+}
+
+.video video {
+  width: 100%;
+}

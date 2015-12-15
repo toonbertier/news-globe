@@ -11,28 +11,31 @@ let api = require('../modules/api');
 let Article = require('./modules/Article');
 let Camera = require('./modules/Camera');
 let Controls = require('./modules/Controls');
-let Dot = require('./modules/Dot');
+let VideoChat = require('./modules/VideoChat');
+
+import {Dot, NewsDot, WebcamDot} from './modules/Dot';
 
 let scene, camera, renderer, controls;
 let currentArticle;
-let geoArticles = [], newsDots = [];
+let geoArticles = [], newsDots = [], webcamDots = [];
+let socket, peer, videochat;
 
 const EARTH_RADIUS = 100;
 const DOTTYPES = {
   'NEWS': {
     'type': 'news',
     'color': 0xff0000,
-    'radius': 0.5
+    'radius': 0.7
   },
   'USER': {
     'type': 'user',
     'color': 0x00ff00,
-    'radius': 1
+    'radius': 0.3
   },
   'WEBCAM': {
     'type': 'webcam',
-    'color': 0xff00ff,
-    'radius': 3
+    'color': 0x0000ff,
+    'radius': 0.5
   }
 };
 
@@ -87,7 +90,7 @@ const createNewsDots = () => {
           if(geocode !== undefined) {
             article.location = geocode;
             geoArticles.push(article);
-            let dot = new Dot(article.location.lat, article.location.lng, EARTH_RADIUS, DOTTYPES.NEWS, key);
+            let dot = new NewsDot(article.location.lat, article.location.lng, EARTH_RADIUS, DOTTYPES.NEWS, key);
             newsDots.push(dot);
             scene.add(dot.el);
           }
@@ -105,29 +108,86 @@ const createNewsDots = () => {
 
 };
 
-const mouseClickedHandler = (objects) => {
+const createWebcamDot = user => {
 
-  let clickedNewsDot = false;
+  let dot = new WebcamDot(user.lat, user.long, EARTH_RADIUS, DOTTYPES.WEBCAM, user.socketid);
+  webcamDots.push(dot);
+  scene.add(dot.el);
 
-  for (let i = 0; i < objects.length; i++) {
+};
 
-    let obj = objects[i].object;
+const removeWebcamDot = user => {
 
-    for(let j = 0; j < newsDots.length; j++) {
-      if(newsDots[j].el.uuid === obj.uuid) {
-        clickedNewsDot = newsDots[j];
-        break;
-      }
+  let dot = webcamDots.find(w => w.lat === user.lat && w.long === user.long);
+  scene.remove(dot.el);
+  webcamDots = webcamDots.filter(w => w.el.uuid !== dot.el.uuid);
+
+};
+
+const mouseClickedHandler = intersects => {
+
+  let clickedDot = false;
+
+  for(let i = 0; i < intersects.length; i++) {
+
+    let intersect = intersects[i];
+
+    clickedDot = searchDotInArray(newsDots, intersect);
+    if(!clickedDot) clickedDot = searchDotInArray(webcamDots, intersect);
+    if(clickedDot) break;
+
+  }
+
+  if(clickedDot) {
+    if(clickedDot instanceof NewsDot) {
+      handleClickedNewsDot(clickedDot);
+    }
+    if(clickedDot instanceof WebcamDot) {
+      handleClickedWebcamDot(clickedDot);
+    }
+  }
+
+};
+
+const searchDotInArray = (arr, intersect) => {
+
+  for(let i = 0; i < arr.length; i++) {
+    if(arr[i].el.uuid === intersect.object.uuid) {
+      return arr[i];
+    }
+  }
+
+  return false;
+
+};
+
+const handleClickedNewsDot = dot => {
+  currentArticle = new Article(geoArticles[dot.articleId]);
+  currentArticle.render();
+};
+
+const handleClickedWebcamDot = dot => {
+  socket.emit('try_calling', dot.socketid);
+};
+
+const getUserLocation = () => {
+
+  return new Promise((resolve, reject) => {
+
+     if ('geolocation' in navigator) {
+
+      navigator.geolocation.getCurrentPosition(position => {
+
+        let dot = new Dot(position.coords.latitude, position.coords.longitude, EARTH_RADIUS, DOTTYPES.USER);
+        scene.add(dot.el);
+
+        resolve(position);
+
+      });
+
     }
 
-    if(clickedNewsDot) break;
-
-  }
-
-  if(clickedNewsDot) {
-    currentArticle = new Article(geoArticles[clickedNewsDot.articleId]);
-    currentArticle.render();
-  }
+  });
 
 };
 
@@ -145,24 +205,103 @@ const setupControls = () => {
 
 };
 
-const getUserLocation = () => {
+const setupPeer = () => {
 
-  if ('geolocation' in navigator) {
+  peer = new Peer({
+    key: 'hsios35yqzi79zfr'
+  });
 
-    navigator.geolocation.getCurrentPosition(position => {
-      let dot = new Dot(position.coords.latitude, position.coords.longitude, EARTH_RADIUS, DOTTYPES.USER);
-      scene.add(dot.el);
+  peer.on('open', peerid => {
+    socket.emit('peerid', peerid);
+  });
+
+  peer.on('call', call => {
+    let el = videochat.renderAcceptCall({country: 'testlocatie'});
+
+    el.querySelector('.accept').addEventListener('click', e => {
+      call.answer(videochat.userStream);
+      el = videochat.renderCall();
     });
 
-  } else {
-    console.log('geen geolocatie');
-  }
+    el.querySelector('.deny').addEventListener('click', e => {
+      document.querySelector('.videochat').innerHTML = '';
+      socket.emit('call_denied', call.peer);
+      call.close()
+    });
+
+    call.on('stream', stream => {
+      el.querySelector('.user-video-el').src = window.URL.createObjectURL(videochat.userStream);
+      el.querySelector('.stranger-video-el').src = window.URL.createObjectURL(stream);
+
+      el.querySelector('.end-call').addEventListener('click', e => {
+        call.close();
+      });
+    });
+
+    call.on('close', () => {
+      document.querySelector('.videochat').innerHTML = '';
+    });
+
+  });
+
+}
+
+const setupSocket = (pos) => {
+
+  socket = io('http://localhost:3000', {query: `long=${pos.coords.longitude}&lat=${pos.coords.latitude}`});
+  socket.on('connect', setupPeer);
+
+  socket.on('init', users => {
+    users.forEach(user => {
+      createWebcamDot(user);
+    });
+  });
+
+  socket.on('new_user', user => {
+    createWebcamDot(user);
+  });
+
+  socket.on('user_left', user => {
+    removeWebcamDot(user);
+  });
+
+  socket.on('user_already_in_call', socketid => {
+    videochat.renderAlreadyInCall();
+  });
+
+  socket.on('call_was_denied', socketid => {
+    videochat.renderDeniedCall();
+  });
+
+  socket.on('ready_to_call_peer', peerid => {
+    let call = peer.call(peerid, videochat.userStream);
+
+    let el = videochat.renderWaitingCall({country: 'testlocatie'});
+    el.querySelector('.end').addEventListener('click', e => {
+      console.log('end call');
+      call.close();
+    });
+
+    call.on('stream', stream => {
+      let el = videochat.renderCall();
+      el.querySelector('.user-video-el').src = window.URL.createObjectURL(videochat.userStream);
+      el.querySelector('.stranger-video-el').src = window.URL.createObjectURL(stream);
+
+      el.querySelector('.end-call').addEventListener('click', e => {
+        call.close();
+      });
+
+    });
+
+    call.on('close', () => {
+      document.querySelector('.videochat').innerHTML = '';
+      socket.emit('call_ended', peerid);
+    });
+  });
 
 };
 
 const init = () => {
-
-  getUserLocation();
 
   scene = new THREE.Scene();
   camera = new Camera();
@@ -179,10 +318,18 @@ const init = () => {
 
   document.querySelector('main').appendChild(renderer.domElement);
 
-  createGlobe().then(() => {
+  createGlobe()
+  .then(() => {
     document.querySelector('.loading').classList.add('hide');
     createNewsDots();
     update();
+  });
+
+  getUserLocation()
+  .then(userPos => {
+    videochat = new VideoChat();
+    videochat.init();
+    setupSocket(userPos);
   });
 
 };
