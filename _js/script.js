@@ -20,12 +20,14 @@ let currentArticle;
 let geoArticles = [], newsDots = [], webcamDots = [];
 let socket, peer, videochat;
 
+const MAPWIDTH = 4096;
+const MAPHEIGHT = 2048;
 const EARTH_RADIUS = 100;
 const DOTTYPES = {
   'NEWS': {
     'type': 'news',
-    'color': 0xff0000,
-    'radius': 0.7
+    'color': 0x65EBFF,
+    'radius': 1
   },
   'USER': {
     'type': 'user',
@@ -53,36 +55,82 @@ const render = () => {
 
 const createGlobe = () => {
 
-  return new Promise((resolve, reject) => {
+  let projection = d3.geo.equirectangular().translate([MAPWIDTH/2, MAPHEIGHT/2]).scale(652);
 
-    let textureLoader = new THREE.TextureLoader();
+  d3.json('../data/world.json', (err, data) => {
 
-    textureLoader.load('../assets/world_map.svg',
-      texture => {
-        let geometry = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
-        let material = new THREE.MeshLambertMaterial({color: 0xffffff});
-        material.map = texture;
-        material.transparent = false;
+    let countries = topojson.feature(data, data.objects.countries);
+    let canvas = d3.select("body").append("canvas").style("display", "none").attr({width: MAPWIDTH, height: MAPHEIGHT});
+    let context = canvas.node().getContext("2d");
+    let path = d3.geo.path().projection(projection).context(context);
 
-        let earth = new THREE.Mesh(geometry, material);
+    context.beginPath();
 
-        scene.add(earth);
-        return resolve(true);
-      },
-      xhr => {
-        console.log(`${xhr.loaded / xhr.total * 100} % loaded`);
-      }
-    );
+    path(countries);
+
+    context.fillStyle = '#03021C';
+    context.strokeStyle = '#192E65';
+    context.lineWidth = 0.25;
+    context.shadowColor = '#57B4E4';
+    context.shadowBlur = 5;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
+
+    context.fill();
+    context.stroke();
+
+    let earthGeometry = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
+
+    let seaMaterial = new THREE.MeshLambertMaterial({color: 0x010303});
+    let seaMesh = new THREE.Mesh(earthGeometry, seaMaterial);
+
+    let mapTexture = new THREE.Texture(canvas.node());
+    mapTexture.needsUpdate = true;
+
+    let mapMaterial = new THREE.MeshLambertMaterial({map: mapTexture, transparent: true});
+    let mapMesh = new THREE.Mesh(earthGeometry, mapMaterial);
+
+    let earth = new THREE.Object3D();
+    earth.add(seaMesh);
+    earth.add(mapMesh);
+    scene.add(earth);
+
+    canvas.remove();
 
   });
 
+  // return new Promise((resolve, reject) => {
+
+  //   let textureLoader = new THREE.TextureLoader();
+
+  //   textureLoader.load('../assets/world_map_countries.svg',
+  //     texture => {
+  //       let geometry = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
+  //       let material = new THREE.MeshLambertMaterial({color: 0xffffff});
+  //       material.map = texture;
+  //       material.transparent = false;
+
+  //       let earth = new THREE.Mesh(geometry, material);
+
+  //       scene.add(earth);
+  //       return resolve(true);
+  //     },
+  //     xhr => {
+  //       console.log(`${xhr.loaded / xhr.total * 100} % loaded`);
+  //     }
+  //   );
+
+  // });
+
 };
 
-const createNewsDots = () => {
+const createNewsDots = (NYTimesOffset) => {
 
-  api.getArticlesFromURL('http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/30.json?api-key=ecc27eb06cf46f006dc3111d9c5b7824:1:73657688').then(articles => {
+  api.getArticlesFromURL(`http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/30.json?api-key=ecc27eb06cf46f006dc3111d9c5b7824:1:73657688&offset=${NYTimesOffset}`).then(articles => {
 
     $.each(articles, (key, article) => {
+
+      console.log(article);
 
       setTimeout(() => {
         api.getGeolocationByAddress(article.geo_facet[0]).then(geocode => {
@@ -93,6 +141,7 @@ const createNewsDots = () => {
             let dot = new NewsDot(article.location.lat, article.location.lng, EARTH_RADIUS, DOTTYPES.NEWS, key);
             newsDots.push(dot);
             scene.add(dot.el);
+            scene.add(dot.line);
           }
 
         });
@@ -127,6 +176,8 @@ const removeWebcamDot = user => {
 const mouseClickedHandler = intersects => {
 
   let clickedDot = false;
+
+  console.log(intersects);
 
   for(let i = 0; i < intersects.length; i++) {
 
@@ -318,12 +369,20 @@ const init = () => {
 
   document.querySelector('main').appendChild(renderer.domElement);
 
-  createGlobe()
-  .then(() => {
-    document.querySelector('.loading').classList.add('hide');
-    createNewsDots();
-    update();
-  });
+  // createGlobe()
+  // .then(() => {
+  //   document.querySelector('.loading').classList.add('hide');
+  //   createNewsDots();
+  //   update();
+  // });
+
+  createGlobe();
+  document.querySelector('.loading').classList.add('hide');
+  for(let i = 0; i < 6; i++) {
+    let NYTimesOffset = i * 20;
+    createNewsDots(NYTimesOffset);
+  }
+  update();
 
   getUserLocation()
   .then(userPos => {

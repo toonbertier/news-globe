@@ -18,11 +18,10 @@ export default class Camera {
       1, 10000
     );
 
-    this.el.position.set(0, 0, 200);
     this.el.lookAt(new THREE.Vector3(0, 0, 0));
 
-    this.light = new THREE.SpotLight(0xffffff, 0.8);
-    this.light.position.set(this.el.position.x, this.el.position.y, this.el.position.z);
+    this.light = new THREE.SpotLight(0xffffff, 1);
+    this.light.exponent = 5;
 
   }
 
@@ -44,9 +43,7 @@ export default class Camera {
       newCamLong = this.long - this.longSpeed;
     }
 
-    if(newCamLong > -90 && newCamLong < 100) {
-      this.long = newCamLong;
-    }
+    this.long = newCamLong;
 
     let newCamLat;
     if(this.latDir) {
@@ -59,7 +56,7 @@ export default class Camera {
       this.lat = newCamLat;
     }
 
-    let pos = latLongToVector3(this.lat, this.long, 100, 100);
+    let pos = latLongToVector3(this.lat, this.long, 100, 200);
     this.el.position.set(pos.x, pos.y, pos.z);
 
     this.el.lookAt(new THREE.Vector3(0, 0, 0));

@@ -12,16 +12,32 @@ export default class Article {
 
   render() {
 
+    this.renderTemplate();
+
     this.getArticleContentFromNYTimes()
     .then(paragraphs => {
 
-      this.data.paragraphs = paragraphs;
+      let trimmedParagraphs = {}
 
-      $('.article').innerHTML = '';
-      let tpl = html(articleTpl(this.data));
-      $('.article').append(tpl);
+      for (var index in paragraphs) {
+        if(index < 6) {
+          trimmedParagraphs[index] = paragraphs[index];
+        }
+      }
+
+      this.data.paragraphs = trimmedParagraphs;
+
+      this.renderTemplate();
 
     });
+
+  }
+
+  renderTemplate() {
+
+    $('.article').html('');
+    let tpl = html(articleTpl(this.data));
+    $('.article').append(tpl);
 
   }
 

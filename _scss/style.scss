@@ -8,6 +8,10 @@ body,
   height: 100%;
 }
 
+html {
+  background-color: #000;
+}
+
 body {
   font-size: 62.5%;
   font-family: 'Helvetica neue', Helvetica, Arial, sans-serif;
@@ -31,14 +35,42 @@ body {
 .videochat {
   position: absolute;
   background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
+  color: #eee;
   padding: 10px;
-  font-size: 1.6em;
 }
 
 .article {
-  top: 50px;
-  right: 50px;
+  top: 40px;
+  right: 20px;
+  width: 30%;
+
+  h1 {
+    font-weight: bolder;
+    font-size: 1.6em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    color: #7DDAF0;
+    margin-bottom: 8px;
+  }
+
+  .paragraph {
+    font-size: 1.2em;
+    margin-bottom: 3px;
+    color: #ddd;
+  }
+
+  .url {
+    font-size: 1em;
+    font-style: italic;
+
+    span {
+      font-style: normal;
+      font-weight: bolder;
+    }
+  }
 }
 
 .videochat {
