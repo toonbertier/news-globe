@@ -56,7 +56,7 @@ export default class Camera {
       this.lat = newCamLat;
     }
 
-    let pos = latLongToVector3(this.lat, this.long, 100, 200);
+    let pos = latLongToVector3(this.lat, this.long, 100, 250);
     this.el.position.set(pos.x, pos.y, pos.z);
 
     this.el.lookAt(new THREE.Vector3(0, 0, 0));
