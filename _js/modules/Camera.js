@@ -52,7 +52,7 @@ export default class Camera {
       newCamLat = this.lat - this.latSpeed;
     }
 
-    if(newCamLat > -45 && newCamLat < 45) {
+    if(newCamLat > -70 && newCamLat < 70) {
       this.lat = newCamLat;
     }
 

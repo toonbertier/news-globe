@@ -59,22 +59,26 @@ const createNewsDots = (NYTimesOffset) => {
 
     $.each(articles, (key, article) => {
 
-      setTimeout(() => {
-        api.getGeolocationByAddress(article.geo_facet[0]).then(geocode => {
+      if(article.url.indexOf('interactive') == -1) {
 
-          if(geocode !== undefined) {
+        setTimeout(() => {
+          api.getGeolocationByAddress(article.geo_facet[0]).then(geocode => {
 
-            article.location = geocode;
-            let length = geoArticles.push(article);
-            let articleKey = length - 1;
-            let dot = new NewsDot(article.location.lat, article.location.lng, EARTH_RADIUS, DOTTYPES.NEWS, articleKey);
-            newsDots.push(dot);
-            scene.add(dot.render());
-            scene.add(dot.renderLine());
-          }
+            if(geocode !== undefined) {
 
-        });
-      }, key * 200);
+              article.location = geocode;
+              let length = geoArticles.push(article);
+              let articleKey = length - 1;
+              let dot = new NewsDot(article.location.lat, article.location.lng, EARTH_RADIUS, DOTTYPES.NEWS, articleKey);
+              newsDots.push(dot);
+              scene.add(dot.render());
+              scene.add(dot.renderLine());
+            }
+
+          });
+        }, key * 200);
+
+      }
 
     });
 

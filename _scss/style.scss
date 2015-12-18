@@ -4,7 +4,8 @@
 html,
 body,
 .loading-div,
-.grid-overlay {
+.grid-overlay,
+.hud-overlay {
   width: 100%;
   height: 100%;
 }
@@ -20,6 +21,12 @@ body {
 
 .hide {
   display: none;
+}
+
+.hud-overlay {
+  position: absolute;
+  z-index: 2000;
+  background: url('/assets/hud.png') center center no-repeat;
 }
 
 .grid-overlay {
