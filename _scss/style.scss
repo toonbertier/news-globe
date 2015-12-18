@@ -29,12 +29,25 @@ body {
   background: url('/assets/hud.png') center center no-repeat;
 }
 
-.camera-values {
+.hud-info {
+  width: 320px;
   position: absolute;
   z-index: 2001;
   color: #C0C0C2;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
   top: 53%;
-  left: 47.5%;
+  text-align: center;
+}
+
+.camera-values {
+  margin-bottom: 10px;
+}
+
+.dot-title {
+  margin-bottom: 5px;
 }
 
 .grid-overlay {

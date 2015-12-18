@@ -27,17 +27,17 @@ const DOTTYPES = {
   'NEWS': {
     'type': 'news',
     'color': 0x65EBFF,
-    'radius': 1
+    'radius': 1.2
   },
   'USER': {
     'type': 'user',
     'color': 0x00ff00,
-    'radius': 0.3
+    'radius': 0.5
   },
   'WEBCAM': {
     'type': 'webcam',
     'color': 0x0000ff,
-    'radius': 0.5
+    'radius': 1.2
   }
 };
 
@@ -109,62 +109,69 @@ const removeWebcamDot = user => {
 
 const checkTargets = () => {
 
-  console.log(newsDots[0].lat);
+  let foundNews = [];
+  let foundCams = [];
 
-  let foundNews = searchDotInLatAndLongRange(newsDots);
-  let foundCams = searchDotInLatAndLongRange(webcamDots);
+  if(newsDots.length > 0) {
+    foundNews = searchDotInLatAndLongRange(newsDots);
+  }
+
+  if(webcamDots.length > 0) {
+    foundCams = searchDotInLatAndLongRange(webcamDots);
+  }
+
+  let closest = [];
 
   if(foundNews.length > 0) {
-    console.log(foundNews);
+    closest.push(findClosestLatAndLong(foundNews));
+  }
+  if(foundCams.length > 0) {
+    closest.push(findClosestLatAndLong(foundCams));
+  }
+
+  if(closest.length > 0) {
+    let foundDot = findClosestLatAndLong(closest);
+    showDotButton(foundDot);
+  } else {
+    hideDotButton();
   }
 
 };
 
-const mouseClickedHandler = intersects => {
+const showDotButton = (dot) => {
 
-  // let clickedDots = [];
-
-  // for(let i = 0; i < intersects.length; i++) {
-
-  //   let intersect = intersects[i];
-
-  //   let clickedDot = searchDotInArray(newsDots, intersect);
-  //   if(!clickedDot) clickedDot = searchDotInArray(webcamDots, intersect);
-
-  //   if(clickedDot) {
-  //     clickedDots.push(clickedDot);
-  //   }
-
-  // }
-
-  // if(clickedDots.length > 0) {
-
-  //   let curr = clickedDots[0];
-  //   let latDiff = Math.abs(camera.lat - curr.lat);
-  //   let longDiff = Math.abs(camera.long - curr.long);
-
-  //   clickedDots.forEach((dot, index) => {
-
-  //     let newLatDiff = Math.abs(camera.lat - dot.lat);
-  //     let newLongDiff = Math.abs(camera.long - dot.long);
-
-  //     if(newLatDiff < latDiff && newLongDiff < longDiff) {
-  //       curr = clickedDots[index];
-  //       latDiff = newLatDiff;
-  //       longDiff = newLongDiff;
-  //     }
-
-  //   });
-
-  //   if(curr instanceof NewsDot) {
+   //   if(curr instanceof NewsDot) {
   //     handleClickedNewsDot(curr);
   //   }
   //   if(curr instanceof WebcamDot) {
   //     handleClickedWebcamDot(curr);
   //   }
 
-  // }
+  if(dot instanceof NewsDot) {
+    $('.dot-title').text(geoArticles[dot.articleId].title);
+    $('.read-button').text('READ MORE');
+    $('.read-button').on('click', e => {
+      e.preventDefault();
+      handleClickedNewsDot(dot)
+    });
+  }
+  if(dot instanceof WebcamDot) {
+    $('.dot-title').text('User available for videochat');
+    $('.read-button').text('OPEN');
+    $('.read-button').on('click', e => {
+      e.preventDefault();
+      handleClickedWebcamDot(dot)
+    });
+  }
 
+  $('.dot-title').removeClass('hide');
+  $('.read-button').removeClass('hide');
+
+};
+
+const hideDotButton = () => {
+  $('.dot-title').addClass('hide');
+  $('.read-button').addClass('hide');
 };
 
 const searchDotInLatAndLongRange = (arr) => {
@@ -172,18 +179,39 @@ const searchDotInLatAndLongRange = (arr) => {
   let found = [];
 
   for(let i = 0; i < arr.length; i++) {
-    if(arr[i].lat > camera.lat - 1
-      && arr[i].lat < camera.lat + 1
-      && arr[i].long > camera.long - 1
-      && arr[i].long < camera.long + 1)
+    if(arr[i].lat > camera.lat - 3
+      && arr[i].lat < camera.lat + 3
+      && arr[i].long > camera.long - 3
+      && arr[i].long < camera.long + 3)
     {
-
       found.push(arr[i]);
-
     }
   }
 
   return found;
+
+};
+
+const findClosestLatAndLong = (arr, lat, long) => {
+
+  let curr = arr[0];
+  let latDiff = Math.abs(lat - curr.lat);
+  let longDiff = Math.abs(long - curr.long);
+
+  arr.forEach((dot, index) => {
+
+    let newlatDiff = Math.abs(lat - dot.lat);
+    let newlongDiff = Math.abs(long - dot.long);
+
+    if(newlatDiff < latDiff && newlongDiff < longDiff) {
+      curr = arr[index];
+      latDiff = newlatDiff;
+      longDiff = newlongDiff;
+    }
+
+  });
+
+  return curr;
 
 };
 
