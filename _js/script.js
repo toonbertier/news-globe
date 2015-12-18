@@ -140,6 +140,8 @@ const checkTargets = () => {
 
 const showDotButton = (dot) => {
 
+  $('.hud-instructions').removeClass('hide');
+
   if(dot instanceof NewsDot) {
     $('.dot-title').text(geoArticles[dot.articleId].title);
     $('.read-button').text('READ MORE');
@@ -163,6 +165,7 @@ const showDotButton = (dot) => {
 };
 
 const hideDotButton = () => {
+  $('.hud-instructions').removeClass('hide');
   $('.dot-title').addClass('hide');
   $('.read-button').addClass('hide');
 };
@@ -290,7 +293,10 @@ const setupPeer = () => {
       videochat.onStream(stream, call);
     });
 
-    call.on('close', videochat.onClose);
+    call.on('close', () => {
+      videochat.onClose;
+      currentVideoChat = undefined;
+    });
 
   });
 
@@ -335,6 +341,7 @@ const setupSocket = (pos) => {
     call.on('close', () => {
       videochat.onClose();
       socket.emit('call_ended', peerid);
+      currentVideoChat = undefined;
     });
 
   });
