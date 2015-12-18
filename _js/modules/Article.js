@@ -39,7 +39,7 @@ export default class Article {
 
   renderArticleTemplate() {
 
-    $('.article-news').html('');
+    $('.article-news').remove();
     let tpl = html(articleTpl(this.data));
     $('.article-section').prepend(tpl);
 
@@ -80,6 +80,10 @@ export default class Article {
 
     this.getTweetsByUrl(`http://localhost:3000/twitter/words/${queryStr}`)
     .then(tweets =>  {
+
+      if(tweets.data) {
+        if(tweets.data.errors) return $('.error-alert').text(tweets.data.errors[0].message);
+      }
 
       if(tweets.statuses.length > 0) {
         this.renderTweets(tweets)

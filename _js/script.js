@@ -188,16 +188,16 @@ const searchDotInLatAndLongRange = (arr) => {
 
 };
 
-const findClosestLatAndLong = (arr, lat, long) => {
+const findClosestLatAndLong = (arr) => {
 
   let curr = arr[0];
-  let latDiff = Math.abs(lat - curr.lat);
-  let longDiff = Math.abs(long - curr.long);
+  let latDiff = Math.abs(camera.lat - curr.lat);
+  let longDiff = Math.abs(camera.long - curr.long);
 
   arr.forEach((dot, index) => {
 
-    let newlatDiff = Math.abs(lat - dot.lat);
-    let newlongDiff = Math.abs(long - dot.long);
+    let newlatDiff = Math.abs(camera.lat - dot.lat);
+    let newlongDiff = Math.abs(camera.long - dot.long);
 
     if(newlatDiff < latDiff && newlongDiff < longDiff) {
       curr = arr[index];

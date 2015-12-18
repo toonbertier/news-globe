@@ -21,7 +21,7 @@ const getTweetsByHashtag = (hashtag) => {
       process.env.TOKEN,
       process.env.SECRET,
       function (error, data, response){
-        if (error) console.error(error);
+        if (error) return resolve(error);
         data = JSON.parse(data);
         return resolve(data);
     });
@@ -49,7 +49,7 @@ const getTweetsByWords = (words) => {
       process.env.TOKEN,
       process.env.SECRET,
       function (error, data, response){
-        if (error) console.error(error);
+        if (error) return resolve(error);
         data = JSON.parse(data);
         return resolve(data);
     });

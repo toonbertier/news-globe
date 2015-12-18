@@ -24,8 +24,8 @@ module.exports = [
     handler: (request, reply) => {
 
       twitter.getTweetsByHashtag(request.params.query)
-      .then(tweets => {
-        return reply(tweets);
+      .then(data => {
+        return reply(data);
       });
 
     }
@@ -37,8 +37,8 @@ module.exports = [
     handler: (request, reply) => {
 
       twitter.getTweetsByWords(request.params.query)
-      .then(tweets => {
-        return reply(tweets);
+      .then(data => {
+        return reply(data);
       });
 
     }
