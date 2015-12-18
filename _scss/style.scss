@@ -30,7 +30,7 @@ body {
 }
 
 .hud-info {
-  width: 320px;
+  width: 300px;
   position: absolute;
   z-index: 2001;
   color: #C0C0C2;
@@ -43,11 +43,24 @@ body {
 }
 
 .camera-values {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .dot-title {
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  font-size: 1.2em;
+}
+
+.read-button {
+  background: url('/assets/button-bg.png') center center no-repeat;
+  background-size: contain;
+  color: #ccc;
+  border: none;
+  padding: 5px;
+
+  .read-button:hover {
+    cursor: pointer;
+  }
 }
 
 .grid-overlay {

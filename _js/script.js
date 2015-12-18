@@ -16,7 +16,7 @@ let VideoChat = require('./modules/VideoChat');
 import {Dot, NewsDot, WebcamDot} from './modules/Dot';
 
 let scene, camera, renderer, controls;
-let currentArticle;
+let currentArticle, currentVideoChat;
 let geoArticles = [], newsDots = [], webcamDots = [];
 let socket, peer, videochat;
 
@@ -140,13 +140,6 @@ const checkTargets = () => {
 
 const showDotButton = (dot) => {
 
-   //   if(curr instanceof NewsDot) {
-  //     handleClickedNewsDot(curr);
-  //   }
-  //   if(curr instanceof WebcamDot) {
-  //     handleClickedWebcamDot(curr);
-  //   }
-
   if(dot instanceof NewsDot) {
     $('.dot-title').text(geoArticles[dot.articleId].title);
     $('.read-button').text('READ MORE');
@@ -179,10 +172,10 @@ const searchDotInLatAndLongRange = (arr) => {
   let found = [];
 
   for(let i = 0; i < arr.length; i++) {
-    if(arr[i].lat > camera.lat - 3
-      && arr[i].lat < camera.lat + 3
-      && arr[i].long > camera.long - 3
-      && arr[i].long < camera.long + 3)
+    if(arr[i].lat > camera.lat - 0.5
+      && arr[i].lat < camera.lat + 2.2
+      && arr[i].long > camera.long - 0.5
+      && arr[i].long < camera.long + 2.2)
     {
       found.push(arr[i]);
     }
@@ -216,12 +209,24 @@ const findClosestLatAndLong = (arr, lat, long) => {
 };
 
 const handleClickedNewsDot = dot => {
-  currentArticle = new Article(geoArticles[dot.articleId]);
-  currentArticle.render();
+
+  if(currentArticle == undefined || currentArticle.data.id !== geoArticles[dot.articleId].id) {
+
+    console.log('handling news dot');
+    currentArticle = new Article(geoArticles[dot.articleId]);
+    currentArticle.render();
+
+  }
+
 };
 
 const handleClickedWebcamDot = dot => {
-  socket.emit('try_calling', dot.socketid);
+
+  if(currentVideoChat == undefined || currentVideoChat !== dot.socketid) {
+    currentVideoChat = dot.socketid;
+    socket.emit('try_calling', dot.socketid);
+  }
+
 };
 
 const getUserLocation = () => {
@@ -254,30 +259,6 @@ const setupControls = () => {
     camera.setCameraValues(v);
   });
 
-  bean.on(controls, 'mouse_clicked', o => {
-    mouseClickedHandler(o);
-  });
-
-};
-
-const onStream = (stream, call) => {
-
-  let el = videochat.renderCall();
-
-  videochat.displayCallTime(el.querySelector('.stranger-time p'));
-
-  el.querySelector('.user-video-el').src = window.URL.createObjectURL(videochat.userStream);
-  el.querySelector('.stranger-video-el').src = window.URL.createObjectURL(stream);
-  el.querySelector('.stranger-status p').innerText = 'Connected';
-
-  el.querySelector('.end-call').addEventListener('click', e => {
-    call.close();
-  });
-
-};
-
-const onClose = () => {
-  document.querySelector('.videochat').innerHTML = '';
 };
 
 const setupPeer = () => {
@@ -306,10 +287,10 @@ const setupPeer = () => {
 
     call.on('stream', stream => {
       el.remove();
-      onStream(stream, call);
+      videochat.onStream(stream, call);
     });
 
-    call.on('close', onClose);
+    call.on('close', videochat.onClose);
 
   });
 
@@ -348,11 +329,11 @@ const setupSocket = (pos) => {
     let el = videochat.renderWaitingCall({country: 'Belgium'});
 
     call.on('stream', stream => {
-      onStream(stream, call);
+      videochat.onStream(stream, call);
     });
 
     call.on('close', () => {
-      onClose();
+      videochat.onClose();
       socket.emit('call_ended', peerid);
     });
 

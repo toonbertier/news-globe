@@ -32,6 +32,26 @@ export default class VideoChat {
     this.userStream = stream;
   }
 
+  onStream(stream, call) {
+
+    let el = videochat.renderCall();
+
+    this.displayCallTime(el.querySelector('.stranger-time p'));
+
+    el.querySelector('.user-video-el').src = window.URL.createObjectURL(this.userStream);
+    el.querySelector('.stranger-video-el').src = window.URL.createObjectURL(stream);
+    el.querySelector('.stranger-status p').innerText = 'Connected';
+
+    el.querySelector('.end-call').addEventListener('click', e => {
+      call.close();
+    });
+
+  };
+
+  onClose() {
+    document.querySelector('.videochat').innerHTML = '';
+  };
+
   displayCallTime(el) {
 
     this.cTime = 0;

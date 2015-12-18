@@ -8,7 +8,6 @@ export default class Controls {
     this.camera = camera;
 
     window.addEventListener('mousemove', e => this.onMouseMove(e));
-    window.addEventListener('mouseup', e => this.onMouseUp(e));
 
   }
 
@@ -42,21 +41,6 @@ export default class Controls {
     }
 
     bean.fire(this, 'mouse_moved', [values]);
-
-  }
-
-  onMouseUp(e) {
-
-    let mouseX = ( e.clientX / window.innerWidth ) * 2 - 1;
-    let mouseY = -( e.clientY / window.innerHeight ) * 2 + 1;
-    let mouse = new THREE.Vector2(mouseX, mouseY);
-
-    let raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(mouse, this.camera);
-
-    let intersects = raycaster.intersectObjects(this.scene.children);
-
-    bean.fire(this, 'mouse_clicked', [intersects]);
 
   }
 
