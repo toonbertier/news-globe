@@ -277,7 +277,7 @@ const setupPeer = () => {
 
   peer.on('call', call => {
 
-    let el = videochat.renderAcceptCall({country: 'Belgium'});
+    let el = videochat.renderAcceptCall();
 
     el.querySelector('.accept').addEventListener('click', e => {
       call.answer(videochat.userStream);
@@ -333,7 +333,7 @@ const setupSocket = (pos) => {
   socket.on('ready_to_call_peer', peerid => {
 
     let call = peer.call(peerid, videochat.userStream);
-    let el = videochat.renderWaitingCall({country: 'Belgium'});
+    let el = videochat.renderWaitingCall();
 
     call.on('stream', stream => {
       videochat.onStream(stream, call);
