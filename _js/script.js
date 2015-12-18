@@ -303,7 +303,7 @@ const setupPeer = () => {
 
 const setupSocket = (pos) => {
 
-  socket = io('http://localhost:3000', {query: `long=${pos.coords.longitude}&lat=${pos.coords.latitude}`});
+  socket = io('https://devine-news-globe.herokuapp.com/', {query: `long=${pos.coords.longitude}&lat=${pos.coords.latitude}`});
   socket.on('connect', setupPeer);
 
   socket.on('init', users => {

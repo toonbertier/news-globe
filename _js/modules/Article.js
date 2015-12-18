@@ -49,7 +49,7 @@ export default class Article {
 
     return new Promise((resolve, reject) => {
 
-      $.post(`http://${window.location.host}/scrape/`, {url: this.data.url}, content => {
+      $.post(`https://${window.location.host}/scrape/`, {url: this.data.url}, content => {
         return resolve(content);
       });
 
@@ -78,7 +78,7 @@ export default class Article {
       }
     });
 
-    this.getTweetsByUrl(`http://localhost:3000/twitter/words/${queryStr}`)
+    this.getTweetsByUrl(`https://${window.location.host}/twitter/words/${queryStr}`)
     .then(tweets => {
 
       if(tweets.errors) return $('.error-twitter').text(`Twitter API: ' + ${tweets.errors[0].message}`);
@@ -87,7 +87,7 @@ export default class Article {
         this.renderTweets(tweets);
       } else {
         hashtags.forEach(hashtag => {
-          this.getTweetsByUrl(`http://localhost:3000/twitter/hashtag/${hashtag}`)
+          this.getTweetsByUrl(`https://${window.location.host}/twitter/hashtag/${hashtag}`)
           .then(t => this.renderTweets(t));
         });
       }

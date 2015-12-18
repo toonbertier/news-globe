@@ -21,18 +21,6 @@ export class Dot {
     this.el = new THREE.Mesh( geometry, material );
     this.el.position.set(this.pos.x, this.pos.y, this.pos.z);
 
-    // let spriteMaterial = new THREE.SpriteMaterial({
-    //   map: new THREE.ImageUtils.loadTexture('../assets/glow.png'),
-    //   color: this.dotType.color,
-    //   transparent: false,
-    //   blending: THREE.AdditiveBlending
-    // });
-    // this.sprite = new THREE.Sprite(spriteMaterial);
-    // this.sprite.scale.set(this.dotType.radius + 2, this.dotType.radius + 2, 1.0);
-    // this.el.add(this.sprite);
-
-
-
     return this.el;
 
   }
