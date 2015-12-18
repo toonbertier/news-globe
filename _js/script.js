@@ -146,14 +146,16 @@ const showDotButton = (dot) => {
     $('.dot-title').text(geoArticles[dot.articleId].title);
     $('.read-button').text('READ MORE');
     $('.read-button').on('click', e => {
+      console.log('clicked news read dot');
       handleClickedNewsDot(dot);
       $('.read-button').off('click');
     });
   }
   if(dot instanceof WebcamDot) {
     $('.dot-title').text('User available for videochat');
-    $('.read-button').text('OPEN');
+    $('.read-button').text('CALL');
     $('.read-button').on('click', e => {
+      console.log('clicked webcam read dot');
       handleClickedWebcamDot(dot);
       $('.read-button').off('click');
     });
@@ -290,12 +292,13 @@ const setupPeer = () => {
     });
 
     call.on('stream', stream => {
+      socket.emit('calling', call.peer)
       el.remove();
       videochat.onStream(stream, call);
     });
 
     call.on('close', () => {
-      videochat.onClose;
+      videochat.onClose();
       currentVideoChat = undefined;
     });
 
@@ -335,7 +338,13 @@ const setupSocket = (pos) => {
     let call = peer.call(peerid, videochat.userStream);
     let el = videochat.renderWaitingCall();
 
+    socket.on('calling_disconnected', socketid => {
+      call.close();
+    });
+
     call.on('stream', stream => {
+      $('.videochat-waiting').remove();
+      socket.emit('calling', peerid);
       videochat.onStream(stream, call);
     });
 

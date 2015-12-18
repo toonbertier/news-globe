@@ -12,6 +12,7 @@ module.exports.register = (server, options, next) => {
     let lat = socket.handshake.query.lat;
     let long = socket.handshake.query.long;
     let user = new User(socket.id, lat, long);
+    let callingPartner;
 
     // 1. bestaande users doorsturen
     // 2. naar andere users nieuwe user emitten
@@ -22,6 +23,13 @@ module.exports.register = (server, options, next) => {
     socket.on('disconnect', () => {
       users = users.filter(u => u.socketid !== socket.id);
       socket.broadcast.emit('user_left', user);
+      if(user.calling && callingPartner) {
+        io.to(callingPartner.socketid).emit('calling_disconnected');
+      }
+    });
+
+    socket.on('calling', peerid => {
+      callingPartner = users.find(u => u.peerid === peerid);
     });
 
     // 1. huidige user toevoegen aan array nadat array van bestaande users aan huidige user werd doorgestuurd
@@ -53,22 +61,21 @@ module.exports.register = (server, options, next) => {
 
     socket.on('call_denied', peerid => {
       let otherUser = users.find(u => u.peerid === peerid);
-      otherUser.calling = false;
+      if(otherUser) {
+        otherUser.calling = false;
+      }
       user.calling = false;
       io.to(otherUser.socketid).emit('call_was_denied');
     });
 
-    // 1. wanneer huidige user call stopt voor andere user opneemt
-
-    socket.on('stop_try_calling', socketid => {
-
-    });
 
     // 1. wanneer call gedaan is beide users calling property terug op false
 
     socket.on('call_ended', peerid => {
       let otherUser = users.find(u => u.peerid === peerid);
-      otherUser.calling = false;
+      if(otherUser) {
+        otherUser.calling = false;
+      }
       user.calling = false;
     });
 

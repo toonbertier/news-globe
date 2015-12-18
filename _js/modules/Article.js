@@ -85,7 +85,7 @@ export default class Article {
 
       console.log(tweets);
 
-      if(tweets.errors) return $('.error-twitter').text('Twitter API: ' + tweets.errors[0].message + ', tweets will be available in 15 minutes');
+      if(tweets.errors) return $('.error-twitter').text('Twitter API: ' + tweets.errors[0].message);
 
       if(tweets.statuses.length > 0) {
         this.renderTweets(tweets)
