@@ -6,10 +6,10 @@ module.exports = str => {
   var matches = str.match(/http\S+/);
   if(matches !== null) {
 
-    var wrapped = matches.map((v, i, a) => '<a href="' + v + '">' + v + '</a>');
+    var wrapped = matches.map((v) => `<a href=${v}>${v}</a>`);
 
     for (var i = 0; i < matches.length; i++) {
-        str = str.replace(matches[i], wrapped[i]);
+      str = str.replace(matches[i], wrapped[i]);
     }
 
   }
@@ -18,10 +18,10 @@ module.exports = str => {
   matches = str.match(/#(\S*)/g);
   if(matches !== null) {
 
-    var wrapped = matches.map((v, i, a) => '<a href="http://twitter.com/hashtag/' + v.slice(1) +'">' + v + '</a>');
+    var wrapped = matches.map((v) => `<a href="http://twitter.com/hashtag/${v.slice(1)}>${v}</a>`);
 
     for (var i = 0; i < matches.length; i++) {
-        str = str.replace(matches[i], wrapped[i]);
+      str = str.replace(matches[i], wrapped[i]);
     }
 
   }
