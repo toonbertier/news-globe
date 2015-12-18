@@ -29,6 +29,8 @@ export default class Article {
 
       this.data.paragraphs = trimmedParagraphs;
 
+      console.log('render template after scrape');
+
       this.renderArticleTemplate();
 
     });

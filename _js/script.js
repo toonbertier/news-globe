@@ -147,7 +147,8 @@ const showDotButton = (dot) => {
     $('.read-button').text('READ MORE');
     $('.read-button').on('click', e => {
       e.preventDefault();
-      handleClickedNewsDot(dot)
+      handleClickedNewsDot(dot);
+      $('.read-button').off('click');
     });
   }
   if(dot instanceof WebcamDot) {
@@ -155,7 +156,8 @@ const showDotButton = (dot) => {
     $('.read-button').text('OPEN');
     $('.read-button').on('click', e => {
       e.preventDefault();
-      handleClickedWebcamDot(dot)
+      handleClickedWebcamDot(dot);
+      $('.read-button').off('click');
     });
   }
 
@@ -216,6 +218,7 @@ const handleClickedNewsDot = dot => {
   if(currentArticle == undefined || currentArticle.data.id !== geoArticles[dot.articleId].id) {
 
     console.log('handling news dot');
+    currentArticle = undefined;
     currentArticle = new Article(geoArticles[dot.articleId]);
     currentArticle.render();
 
