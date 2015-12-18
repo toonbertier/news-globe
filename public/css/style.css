@@ -135,8 +135,7 @@ body {
 .grid-overlay {
   position: absolute;
   z-index: 1000;
-  background: url("/assets/grid.png") center center no-repeat;
-  background-size: cover;
+  background: url("/assets/grid-point.png") repeat;
 }
 
 .loading {
@@ -151,7 +150,8 @@ body {
 
 .article-section,
 .videochat {
-  z-index: 1001;
+  height: 100%;
+  z-index: 3000;
   position: absolute;
   background-color: rgba(0, 0, 0, 0.5);
   color: #eee;
@@ -165,7 +165,30 @@ body {
 }
 
 .article-section article {
+  height: 30%;
+  padding: 20px;
   margin-bottom: 10px;
+  overflow-y: scroll;
+  border: 1px solid rgba(101, 183, 201, 0.2);
+}
+
+.article-section article.article-news {
+  height: 60%;
+}
+
+.article-section ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.article-section ::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.article-section ::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(101, 183, 201, 0.5);
+  -webkit-box-shadow: inset 0 0 6px rgba(101, 183, 201, 0.5);
 }
 
 .article-section h1 {
