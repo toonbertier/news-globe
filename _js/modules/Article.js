@@ -113,7 +113,7 @@ export default class Article {
 
   renderTwitterFeed() {
 
-    $('.article-tweets').html('');
+    $('.article-tweets').remove();
     let tpl = html(twitterFeedTpl());
     $('.article-section').append(tpl);
 
