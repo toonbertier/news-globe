@@ -83,9 +83,9 @@ export default class Article {
     this.getTweetsByUrl(`http://localhost:3000/twitter/words/${queryStr}`)
     .then(tweets =>  {
 
-      if(tweets.data) {
-        if(tweets.data.errors) return $('.error-alert').text(tweets.data.errors[0].message);
-      }
+      console.log(tweets);
+
+      if(tweets.errors) return $('.error-alert').text('Twitter API: ' + tweets.errors[0].message);
 
       if(tweets.statuses.length > 0) {
         this.renderTweets(tweets)
