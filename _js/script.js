@@ -55,7 +55,7 @@ const render = () => {
 
 const createNewsDots = (NYTimesOffset) => {
 
-  api.getArticlesFromURL(`http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/30.json?api-key=ecc27eb06cf46f006dc3111d9c5b7824:1:73657688&offset=${NYTimesOffset}`).then(articles => {
+  api.getArticlesFromURL(`https://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/30.json?api-key=ecc27eb06cf46f006dc3111d9c5b7824:1:73657688&offset=${NYTimesOffset}`).then(articles => {
 
     $.each(articles, (key, article) => {
 
@@ -175,10 +175,10 @@ const searchDotInLatAndLongRange = (arr) => {
   let found = [];
 
   for(let i = 0; i < arr.length; i++) {
-    if(arr[i].lat > camera.lat - 0.5
-      && arr[i].lat < camera.lat + 2.2
-      && arr[i].long > camera.long - 0.5
-      && arr[i].long < camera.long + 2.2)
+    if(arr[i].lat > camera.lat - 0.4
+      && arr[i].lat < camera.lat + 2.6
+      && arr[i].long > camera.long - 1.8
+      && arr[i].long < camera.long + 1.8)
     {
       found.push(arr[i]);
     }
