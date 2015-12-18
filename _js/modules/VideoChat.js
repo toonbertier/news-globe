@@ -34,7 +34,7 @@ export default class VideoChat {
 
   onStream(stream, call) {
 
-    let el = videochat.renderCall();
+    let el = this.renderCall();
 
     this.displayCallTime(el.querySelector('.stranger-time p'));
 
@@ -49,7 +49,7 @@ export default class VideoChat {
   };
 
   onClose() {
-    document.querySelector('.videochat').innerHTML = '';
+    $('.videochat-call').remove();
   };
 
   displayCallTime(el) {

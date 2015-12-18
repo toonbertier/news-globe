@@ -93,6 +93,14 @@ body {
   top: 20px;
 }
 
+button {
+  background: url("/assets/button-bg.png") center center no-repeat;
+  background-size: contain;
+  color: #ccc;
+  border: none;
+  padding: 5px;
+}
+
 .hud-overlay {
   position: absolute;
   z-index: 2000;
@@ -119,14 +127,6 @@ body {
 .dot-title {
   margin-bottom: 8px;
   font-size: 1.2em;
-}
-
-.read-button {
-  background: url("/assets/button-bg.png") center center no-repeat;
-  background-size: contain;
-  color: #ccc;
-  border: none;
-  padding: 5px;
 }
 
 .grid-overlay {
@@ -264,8 +264,28 @@ body {
   width: 240px;
 }
 
-.video video {
+.video .stranger-video-el,
+.video .user-video-el {
   width: 100%;
+}
+
+.call-info li {
+  display: inline-block;
+  vertical-align: top;
+  width: 32.5%;
+  height: 60px;
+  padding: 0px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+.call-info li p {
+  padding-top: 25px;
+}
+
+.end-call {
+  margin-left: 45%;
+  margin-top: 10px;
 }
 
 .tweet {
