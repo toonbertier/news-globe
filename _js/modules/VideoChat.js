@@ -93,6 +93,7 @@ export default class VideoChat {
   }
 
   renderDeniedCall(data) {
+    $('.videochat-waiting').remove();
     return this.renderTemplate(deniedCallTpl, data);
   }
 

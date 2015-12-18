@@ -330,7 +330,10 @@ const setupSocket = (pos) => {
   });
 
   socket.on('call_was_denied', socketid => {
-    videochat.renderDeniedCall();
+    let el = videochat.renderDeniedCall();
+    setTimeout(() => {
+      $(el).remove();
+    }, 5000);
   });
 
   socket.on('ready_to_call_peer', peerid => {
