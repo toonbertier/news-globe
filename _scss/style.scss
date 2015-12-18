@@ -116,7 +116,7 @@ button {
 
   }
 
-  .url {
+  a {
 
     color: rgba(101, 183, 201, .5);
 
@@ -233,8 +233,24 @@ button {
   margin-top: 10px;
 }
 
-.tweet {
-  margin-bottom: 5px;
+.tweets {
+
+  margin-top: 10px;
+
+  .tweet {
+
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    font-size: 1.2em;
+    border-bottom: 1px solid rgba(101, 183, 201, .2);
+
+    h3 {
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+  }
+
 }
 
 ::-webkit-scrollbar {

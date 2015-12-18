@@ -1,4 +1,4 @@
 <li class="tweet">
-  <h3>{{this.user.screen_name}} - {{this.date_formatted}}</h3>
-  <p>{{this.text}}</p>
+  <h3><a href="https://twitter.com/{{this.user.screen_name}}">{{this.user.screen_name}}</a> - {{this.date_formatted}}</h3>
+  <p>{{{wrapURL this.text}}}</p>
 </li>

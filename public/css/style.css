@@ -174,11 +174,11 @@ button {
   height: 60%;
 }
 
-.article-section .url {
+.article-section a {
   color: rgba(101, 183, 201, 0.5);
 }
 
-.article-section .url:hover {
+.article-section a:hover {
   color: rgba(101, 183, 201, 0.9);
 }
 
@@ -281,8 +281,20 @@ button {
   margin-top: 10px;
 }
 
-.tweet {
-  margin-bottom: 5px;
+.tweets {
+  margin-top: 10px;
+}
+
+.tweets .tweet {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  font-size: 1.2em;
+  border-bottom: 1px solid rgba(101, 183, 201, 0.2);
+}
+
+.tweets .tweet h3 {
+  font-style: italic;
+  margin-bottom: 8px;
 }
 
 ::-webkit-scrollbar {
