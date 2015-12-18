@@ -19,7 +19,7 @@ export default class Article {
     this.getArticleContentFromNYTimes()
     .then(paragraphs => {
 
-      let trimmedParagraphs = {}
+      let trimmedParagraphs = {};
 
       for (var index in paragraphs) {
         if(index < 6) {
@@ -28,8 +28,6 @@ export default class Article {
       }
 
       this.data.paragraphs = trimmedParagraphs;
-
-      console.log('render template after scrape');
 
       this.renderArticleTemplate();
 
@@ -51,9 +49,9 @@ export default class Article {
 
     return new Promise((resolve, reject) => {
 
-      $.post('http://localhost:3000/scrape/', {url: this.data.url}, content => {
+      $.post(`http://${window.location.host}/scrape/`, {url: this.data.url}, content => {
         return resolve(content);
-      })
+      });
 
     });
 
@@ -68,12 +66,12 @@ export default class Article {
     let queryStr = '';
 
     splittedKeywords.forEach(keyword => {
-      if(keyword.indexOf('(') > -1) keyword = keyword.replace(/ *\([^)]*\) */g, "");
+      if(keyword.indexOf('(') > -1) keyword = keyword.replace(/ *\([^)]*\) */g, '');
       keyword = keyword.replace(/\s+/g, '').toLowerCase();
 
       hashtags.push(keyword);
 
-      if(queryStr == '') {
+      if(queryStr === '') {
         queryStr = keyword;
       } else {
         queryStr = `${queryStr}%20OR%20${keyword}`;
@@ -81,18 +79,16 @@ export default class Article {
     });
 
     this.getTweetsByUrl(`http://localhost:3000/twitter/words/${queryStr}`)
-    .then(tweets =>  {
+    .then(tweets => {
 
-      console.log(tweets);
-
-      if(tweets.errors) return $('.error-twitter').text('Twitter API: ' + tweets.errors[0].message);
+      if(tweets.errors) return $('.error-twitter').text(`Twitter API: ' + ${tweets.errors[0].message}`);
 
       if(tweets.statuses.length > 0) {
-        this.renderTweets(tweets)
+        this.renderTweets(tweets);
       } else {
         hashtags.forEach(hashtag => {
           this.getTweetsByUrl(`http://localhost:3000/twitter/hashtag/${hashtag}`)
-          .then(tweets => this.renderTweets(tweets));
+          .then(t => this.renderTweets(t));
         });
       }
 
@@ -131,7 +127,7 @@ export default class Article {
 
   renderTweet(tweet) {
 
-    let date = new Date(tweet.created_at.replace("+0000 ", "") + " UTC");
+    let date = new Date(tweet.created_at.replace('+0000 ', '') + ' UTC');
     tweet.date_formatted = [date.getDate(), date.getMonth(), date.getFullYear()].join('-');
 
     let tpl = html(tweetTpl(tweet));

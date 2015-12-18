@@ -42,15 +42,15 @@ export default class VideoChat {
     el.querySelector('.stranger-video-el').src = window.URL.createObjectURL(stream);
     el.querySelector('.stranger-status p').innerText = 'Connected';
 
-    el.querySelector('.end-call').addEventListener('click', e => {
+    el.querySelector('.end-call').addEventListener('click', () => {
       call.close();
     });
 
-  };
+  }
 
   onClose() {
     $('.videochat-call').remove();
-  };
+  }
 
   displayCallTime(el) {
 
@@ -76,7 +76,7 @@ export default class VideoChat {
         s = `0${s}`;
       }
 
-      let str = `${h}:${m}:${s}`
+      let str = `${h}:${m}:${s}`;
 
       el.innerHTML = str;
 

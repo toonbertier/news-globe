@@ -59,7 +59,7 @@ const createNewsDots = (NYTimesOffset) => {
 
     $.each(articles, (key, article) => {
 
-      if(article.url.indexOf('interactive') == -1) {
+      if(article.url.indexOf('interactive') === -1) {
 
         setTimeout(() => {
           api.getGeolocationByAddress(article.geo_facet[0]).then(geocode => {
@@ -145,19 +145,17 @@ const showDotButton = (dot) => {
   if(dot instanceof NewsDot) {
     $('.dot-title').text(geoArticles[dot.articleId].title);
     $('.read-button').text('READ MORE');
-    $('.read-button').on('click', e => {
-      console.log('clicked news read dot');
-      handleClickedNewsDot(dot);
+    $('.read-button').on('click', () => {
       $('.read-button').off('click');
+      handleClickedNewsDot(dot);
     });
   }
   if(dot instanceof WebcamDot) {
     $('.dot-title').text('User available for videochat');
     $('.read-button').text('CALL');
-    $('.read-button').on('click', e => {
-      console.log('clicked webcam read dot');
-      handleClickedWebcamDot(dot);
+    $('.read-button').on('click', () => {
       $('.read-button').off('click');
+      handleClickedWebcamDot(dot);
     });
   }
 
@@ -180,8 +178,7 @@ const searchDotInLatAndLongRange = (arr) => {
     if(arr[i].lat > camera.lat - 0.4
       && arr[i].lat < camera.lat + 2.6
       && arr[i].long > camera.long - 1.8
-      && arr[i].long < camera.long + 1.8)
-    {
+      && arr[i].long < camera.long + 1.8) {
       found.push(arr[i]);
     }
   }
@@ -215,20 +212,18 @@ const findClosestLatAndLong = (arr) => {
 
 const handleClickedNewsDot = dot => {
 
-  if(currentArticle == undefined || currentArticle.data.id !== geoArticles[dot.articleId].id) {
+  if(currentArticle === undefined || currentArticle.data.id !== geoArticles[dot.articleId].id) {
 
-    console.log('handling news dot');
     currentArticle = undefined;
     currentArticle = new Article(geoArticles[dot.articleId]);
     currentArticle.render();
-
   }
 
 };
 
 const handleClickedWebcamDot = dot => {
 
-  if(currentVideoChat == undefined || currentVideoChat !== dot.socketid) {
+  if(currentVideoChat === undefined || currentVideoChat !== dot.socketid) {
     currentVideoChat = dot.socketid;
     socket.emit('try_calling', dot.socketid);
   }
@@ -239,7 +234,7 @@ const getUserLocation = () => {
 
   return new Promise((resolve, reject) => {
 
-     if ('geolocation' in navigator) {
+    if ('geolocation' in navigator) {
 
       navigator.geolocation.getCurrentPosition(position => {
 
@@ -281,18 +276,18 @@ const setupPeer = () => {
 
     let el = videochat.renderAcceptCall();
 
-    el.querySelector('.accept').addEventListener('click', e => {
+    el.querySelector('.accept').addEventListener('click', () => {
       call.answer(videochat.userStream);
     });
 
-    el.querySelector('.deny').addEventListener('click', e => {
+    el.querySelector('.deny').addEventListener('click', () => {
       document.querySelector('.videochat').innerHTML = '';
       socket.emit('call_denied', call.peer);
-      call.close()
+      call.close();
     });
 
     call.on('stream', stream => {
-      socket.emit('calling', call.peer)
+      socket.emit('calling', call.peer);
       el.remove();
       videochat.onStream(stream, call);
     });
@@ -304,7 +299,7 @@ const setupPeer = () => {
 
   });
 
-}
+};
 
 const setupSocket = (pos) => {
 
@@ -325,11 +320,11 @@ const setupSocket = (pos) => {
     removeWebcamDot(user);
   });
 
-  socket.on('user_already_in_call', socketid => {
+  socket.on('user_already_in_call', () => {
     videochat.renderAlreadyInCall();
   });
 
-  socket.on('call_was_denied', socketid => {
+  socket.on('call_was_denied', () => {
     let el = videochat.renderDeniedCall();
     setTimeout(() => {
       $(el).remove();
@@ -339,9 +334,9 @@ const setupSocket = (pos) => {
   socket.on('ready_to_call_peer', peerid => {
 
     let call = peer.call(peerid, videochat.userStream);
-    let el = videochat.renderWaitingCall();
+    videochat.renderWaitingCall();
 
-    socket.on('calling_disconnected', socketid => {
+    socket.on('calling_disconnected', () => {
       call.close();
     });
 
@@ -368,8 +363,8 @@ const createGlobe = () => {
   d3.json('../data/world.json', (err, data) => {
 
     let countries = topojson.feature(data, data.objects.countries);
-    let canvas = d3.select("body").append("canvas").style("display", "none").attr({width: MAPWIDTH, height: MAPHEIGHT});
-    let context = canvas.node().getContext("2d");
+    let canvas = d3.select('body').append('canvas').style('display', 'none').attr({width: MAPWIDTH, height: MAPHEIGHT});
+    let context = canvas.node().getContext('2d');
     let path = d3.geo.path().projection(projection).context(context);
 
     context.beginPath();

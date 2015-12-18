@@ -40,7 +40,7 @@ const getGeolocationByAddress = address => {
     $.getJSON(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyAcbfdP-Mnjx-Q8bD3B2CMlONFBAJ3ZSRU`, geocode => {
 
       if(geocode.status === 'ZERO_RESULTS') return resolve();
-      if(geocode.error_message) return $('.error-google').text('Google Geocode: ' + geocode.error_message);
+      if(geocode.error_message) return $('.error-google').text(`Google Geocode: ${geocode.error_message}`);
       return resolve(geocode.results[0].geometry.location);
 
 

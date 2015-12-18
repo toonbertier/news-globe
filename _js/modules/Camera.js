@@ -47,7 +47,7 @@ export default class Camera {
       newCamLong = this.long - this.longSpeed;
     }
 
-    if(newCamLong < - 180) {
+    if(newCamLong < -180) {
       newCamLong = Math.abs(this.long % -180);
     }
     if(newCamLong > 180) {
@@ -103,7 +103,7 @@ export default class Camera {
     this.light.rotation.set(this.el.rotation.x, this.el.rotation.y, this.el.rotation.z);
 
     if(this.latSpeed < 0.8 && this.longSpeed < 0.8) {
-      if(this.latSpeed == 0 && this.longSpeed == 0) return;
+      if(this.latSpeed === 0 && this.longSpeed === 0) return;
       bean.fire(this, 'check_targets');
     }
 

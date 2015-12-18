@@ -4,7 +4,7 @@ import {latLongToVector3} from '../helpers/math';
 
 export class Dot {
 
-  constructor(lat, long, earthRadius, dotType, articleId) {
+  constructor(lat, long, earthRadius, dotType) {
 
     this.lat = lat;
     this.long = long;
@@ -42,7 +42,7 @@ export class Dot {
     let lineMaterial = new THREE.LineBasicMaterial({color: 0x444444, linewidth: 0.08});
     let lineGeometry = new THREE.Geometry();
 
-    let beginpos = latLongToVector3(this.lat, this.long, this.earthRadius, 0)
+    let beginpos = latLongToVector3(this.lat, this.long, this.earthRadius, 0);
     lineGeometry.vertices.push(new THREE.Vector3(beginpos.x, beginpos.y, beginpos.z));
     let endpos = latLongToVector3(this.lat, this.long, this.earthRadius, 5);
     lineGeometry.vertices.push(new THREE.Vector3(endpos.x, endpos.y, endpos.z));
