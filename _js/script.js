@@ -146,7 +146,6 @@ const showDotButton = (dot) => {
     $('.dot-title').text(geoArticles[dot.articleId].title);
     $('.read-button').text('READ MORE');
     $('.read-button').on('click', e => {
-      e.preventDefault();
       handleClickedNewsDot(dot);
       $('.read-button').off('click');
     });
@@ -155,7 +154,6 @@ const showDotButton = (dot) => {
     $('.dot-title').text('User available for videochat');
     $('.read-button').text('OPEN');
     $('.read-button').on('click', e => {
-      e.preventDefault();
       handleClickedWebcamDot(dot);
       $('.read-button').off('click');
     });

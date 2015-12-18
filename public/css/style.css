@@ -128,10 +128,6 @@ body {
   padding: 5px;
 }
 
-.read-button .read-button:hover {
-  cursor: pointer;
-}
-
 .grid-overlay {
   position: absolute;
   z-index: 1000;
