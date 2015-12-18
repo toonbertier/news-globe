@@ -37,9 +37,10 @@ const getGeolocationByAddress = address => {
 
   return new Promise((resolve, reject) => {
 
-    $.getJSON(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyAugIXBAA8W_XDbNJTjPRk8-DaE-3mFGko`, geocode => {
+    $.getJSON(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyBhyH5Lu96yJBQxcgF9XIAyj1qRlJqpSgw`, geocode => {
 
       if(geocode.status === 'ZERO_RESULTS') return resolve();
+      console.log(geocode);
       return resolve(geocode.results[0].geometry.location);
 
     }).fail(err => reject(err));

@@ -140,7 +140,7 @@ const checkTargets = () => {
 
 const showDotButton = (dot) => {
 
-  $('.hud-instructions').removeClass('hide');
+  $('.hud-instruction').addClass('hide');
 
   if(dot instanceof NewsDot) {
     $('.dot-title').text(geoArticles[dot.articleId].title);
@@ -165,7 +165,7 @@ const showDotButton = (dot) => {
 };
 
 const hideDotButton = () => {
-  $('.hud-instructions').removeClass('hide');
+  $('.hud-instruction').removeClass('hide');
   $('.dot-title').addClass('hide');
   $('.read-button').addClass('hide');
 };
