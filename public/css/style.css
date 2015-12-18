@@ -88,6 +88,14 @@ body {
   background: url("/assets/hud.png") center center no-repeat;
 }
 
+.camera-values {
+  position: absolute;
+  z-index: 2001;
+  color: #C0C0C2;
+  top: 53%;
+  left: 47.5%;
+}
+
 .grid-overlay {
   position: absolute;
   z-index: 1000;

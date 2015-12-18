@@ -23,20 +23,20 @@ export default class Controls {
 
     if(e.clientX < window.innerWidth/3) {
       values.longDir = false;
-      values.longSpeed = (window.innerWidth/3 - e.clientX) / 500;
+      values.longSpeed = (window.innerWidth/3 - e.clientX) / 700;
     } else if(e.clientX > 2 * window.innerWidth/3) {
       values.longDir = true;
-      values.longSpeed = (e.clientX - 2 * window.innerWidth/3) / 500;
+      values.longSpeed = (e.clientX - 2 * window.innerWidth/3) / 700;
     } else {
       values.longSpeed = 0;
     }
 
     if(e.clientY < window.innerHeight/3) {
       values.latDir = true;
-      values.latSpeed = (window.innerHeight/3 - e.clientY) / 500;
+      values.latSpeed = (window.innerHeight/3 - e.clientY) / 700;
     } else if(e.clientY > 2 * window.innerHeight/3) {
       values.latDir = false;
-      values.latSpeed = (e.clientY - 2 * window.innerHeight/3) / 500;
+      values.latSpeed = (e.clientY - 2 * window.innerHeight/3) / 700;
     } else {
       values.latSpeed = 0;
     }

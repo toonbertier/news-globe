@@ -107,62 +107,83 @@ const removeWebcamDot = user => {
 
 };
 
-const mouseClickedHandler = intersects => {
+const checkTargets = () => {
 
-  let clickedDots = [];
+  console.log(newsDots[0].lat);
 
-  for(let i = 0; i < intersects.length; i++) {
+  let foundNews = searchDotInLatAndLongRange(newsDots);
+  let foundCams = searchDotInLatAndLongRange(webcamDots);
 
-    let intersect = intersects[i];
-
-    let clickedDot = searchDotInArray(newsDots, intersect);
-    if(!clickedDot) clickedDot = searchDotInArray(webcamDots, intersect);
-
-    if(clickedDot) {
-      clickedDots.push(clickedDot);
-    }
-
-  }
-
-  if(clickedDots.length > 0) {
-
-    let curr = clickedDots[0];
-    let latDiff = Math.abs(camera.lat - curr.lat);
-    let longDiff = Math.abs(camera.long - curr.long);
-
-    clickedDots.forEach((dot, index) => {
-
-      let newLatDiff = Math.abs(camera.lat - dot.lat);
-      let newLongDiff = Math.abs(camera.long - dot.long);
-
-      if(newLatDiff < latDiff && newLongDiff < longDiff) {
-        curr = clickedDots[index];
-        latDiff = newLatDiff;
-        longDiff = newLongDiff;
-      }
-
-    });
-
-    if(curr instanceof NewsDot) {
-      handleClickedNewsDot(curr);
-    }
-    if(curr instanceof WebcamDot) {
-      handleClickedWebcamDot(curr);
-    }
-
+  if(foundNews.length > 0) {
+    console.log(foundNews);
   }
 
 };
 
-const searchDotInArray = (arr, intersect) => {
+const mouseClickedHandler = intersects => {
+
+  // let clickedDots = [];
+
+  // for(let i = 0; i < intersects.length; i++) {
+
+  //   let intersect = intersects[i];
+
+  //   let clickedDot = searchDotInArray(newsDots, intersect);
+  //   if(!clickedDot) clickedDot = searchDotInArray(webcamDots, intersect);
+
+  //   if(clickedDot) {
+  //     clickedDots.push(clickedDot);
+  //   }
+
+  // }
+
+  // if(clickedDots.length > 0) {
+
+  //   let curr = clickedDots[0];
+  //   let latDiff = Math.abs(camera.lat - curr.lat);
+  //   let longDiff = Math.abs(camera.long - curr.long);
+
+  //   clickedDots.forEach((dot, index) => {
+
+  //     let newLatDiff = Math.abs(camera.lat - dot.lat);
+  //     let newLongDiff = Math.abs(camera.long - dot.long);
+
+  //     if(newLatDiff < latDiff && newLongDiff < longDiff) {
+  //       curr = clickedDots[index];
+  //       latDiff = newLatDiff;
+  //       longDiff = newLongDiff;
+  //     }
+
+  //   });
+
+  //   if(curr instanceof NewsDot) {
+  //     handleClickedNewsDot(curr);
+  //   }
+  //   if(curr instanceof WebcamDot) {
+  //     handleClickedWebcamDot(curr);
+  //   }
+
+  // }
+
+};
+
+const searchDotInLatAndLongRange = (arr) => {
+
+  let found = [];
 
   for(let i = 0; i < arr.length; i++) {
-    if(arr[i].el.uuid === intersect.object.uuid) {
-      return arr[i];
+    if(arr[i].lat > camera.lat - 1
+      && arr[i].lat < camera.lat + 1
+      && arr[i].long > camera.long - 1
+      && arr[i].long < camera.long + 1)
+    {
+
+      found.push(arr[i]);
+
     }
   }
 
-  return false;
+  return found;
 
 };
 
@@ -363,6 +384,9 @@ const init = () => {
 
   scene = new THREE.Scene();
   camera = new Camera();
+
+  bean.on(camera, 'check_targets', checkTargets);
+
   scene.add(camera.light);
 
   setupControls();
