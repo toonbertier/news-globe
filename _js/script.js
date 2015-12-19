@@ -303,7 +303,7 @@ const setupPeer = () => {
 
 const setupSocket = (pos) => {
 
-  socket = io('', {query: `long=${pos.coords.longitude}&lat=${pos.coords.latitude}`});
+  socket = io(location.origin, {query: `long=${pos.coords.longitude}&lat=${pos.coords.latitude}`});
   socket.on('connect', setupPeer);
 
   socket.on('init', users => {
