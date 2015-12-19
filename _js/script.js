@@ -303,6 +303,8 @@ const setupPeer = () => {
 
 const setupSocket = (pos) => {
 
+  console.log('test heroku git');
+
   socket = io();
   //socket = io(location.origin, {query: `long=${pos.coords.longitude}&lat=${pos.coords.latitude}`});
   socket.on('connect', setupPeer);
