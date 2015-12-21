@@ -49,7 +49,7 @@ export default class Article {
 
     return new Promise((resolve, reject) => {
 
-      $.post('https://devine-news-globe.herokuapp.com/scrape', {url: this.data.url}, content => {
+      $.post('https://news-globe.herokuapp.com/scrape', {url: this.data.url}, content => {
         return resolve(content);
       });
 
@@ -78,7 +78,7 @@ export default class Article {
       }
     });
 
-    this.getTweetsByUrl('https://devine-news-globe.herokuapp.com/twitter/words/${queryStr}')
+    this.getTweetsByUrl('https://news-globe.herokuapp.com/twitter/words/${queryStr}')
     .then(tweets => {
 
       if(tweets.errors) return $('.error-twitter').text(`Twitter API: ' + ${tweets.errors[0].message}`);
@@ -87,7 +87,7 @@ export default class Article {
         this.renderTweets(tweets);
       } else {
         hashtags.forEach(hashtag => {
-          this.getTweetsByUrl('https://devine-news-globe.herokuapp.com/twitter/hashtag/${hashtag}')
+          this.getTweetsByUrl('https://news-globe.herokuapp.com/twitter/hashtag/${hashtag}')
           .then(t => this.renderTweets(t));
         });
       }
